@@ -62,3 +62,9 @@ tag_df = pd.DataFrame({"tag":tags})
 hash_df = pd.DataFrame({"hash":hashtags})
 tag_df.to_csv("tag.csv")
 hash_df.to_csv("hash.csv")
+
+tag_df = pd.DataFrame({"tag":tags,"test":"test"})
+hash_df = pd.DataFrame({"hash":hashtags,"test":"test"})
+
+count_t = tag_df.groupby(by="tag").count().sort_values(by="test",ascending=False)
+count_h = hash_df.groupby(by="tag").count().sort_values(by="test",ascending=False)
