@@ -11,9 +11,9 @@ files = [mypath+"//"+i for i in onlyfiles]
 frames = []
 
 for i in files:
-    df = pd.read_csv(i)
+    df = pd.read_csv(i,error_bad_lines=False)
     frames.append(df)
-
+    
 df = pd.concat(frames)
 
 df2 = df[df.language =="English"]
@@ -28,21 +28,6 @@ for i in tweets:
 tweet_string = " ".join(clean_tweets)
 tokens = word_tokenize(tweet_string)
 text = nltk.Text(tokens)
-
-#collocations = text.collocations()
-#text.similar("Trump")
-
-import nltk
-from nltk.book import *
-fdist = FreqDist(text)
-
-#fdist.most_common(10)
-
-my_set = set(text)
-long_words = [word for word in my_set if len(word) > 15]
-#sorted(long_words)
-
-filtered_array = sorted(set(word.lower() for word in text if word.isalpha() and len(word)>3))
 
 tags = []
 hashtags = []
@@ -67,4 +52,31 @@ tag_df = pd.DataFrame({"tag":tags,"test":"test"})
 hash_df = pd.DataFrame({"hash":hashtags,"test":"test"})
 
 count_t = tag_df.groupby(by="tag").count().sort_values(by="test",ascending=False)
-count_h = hash_df.groupby(by="tag").count().sort_values(by="test",ascending=False)
+count_h = hash_df.groupby(by="hash").count().sort_values(by="test",ascending=False)
+
+count_t.to_csv("tag.csv")
+count_h.to_csv("hash.csv")
+
+n = 2
+for i in range(2,6):
+    array =[]
+    array2 =[]
+    print('getting',i)
+    bgs = nltk.ngrams(tokens,i)
+    print('grams',i)
+    fdist = nltk.FreqDist(bgs)
+    print('dist',i)
+    for k,v in fdist.items():
+        if v >10:
+            array.append(k)
+            array2.append(v)
+            print("got")
+    print('array',i)
+    array1 = []
+    for i in range(len(array)):
+        x = ' '.join(map(str,array[i]))
+        array1.append(x)
+    print('framing',i)
+    df = pd.DataFrame({'phrase':array1,'count': array2}).sort_values(by="count",ascending=False)
+    df.to_csv(str(n)+'_grams.csv')
+    n+=1
